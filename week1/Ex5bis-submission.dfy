@@ -1,7 +1,7 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
 // <Full name 1>: <Student number 1>
-// <Full name 2>: <Student number 2>
+// Matilda Fogato: 1656376
 // END-TODO(Name)
 
 
@@ -23,14 +23,30 @@
  * pre- and postconditions.  */
 
 lemma Ex5bis<T>(P: T -> bool, Q: T -> bool, R: T -> bool)
-    ensures (forall x: T | P(x) :: (Q(x) && R(x))) ==> forall y: T | !Q(y) :: !P(y)
-// BEGIN-TODO(ExerciseB)
-// Add your derivation here.
+  ensures (forall x: T | P(x) :: (Q(x) && R(x))) ==> forall y: T | !Q(y) :: !P(y)
+  //   // BEGIN-TODO(ExerciseB)
+{
+  if (forall x: T | P(x) :: (Q(x) && R(x))) {
+    forall y: T | !Q(y) ensures !P(y) {
+      if (P(y)) {
+        assert Q(y) && R(y);
+        assert Q(y);
+        assert false;
+      }
+      assert !P(y);
+    }
+    assert (forall y: T | !Q(y) :: !P(y));
+  }
+  assert (forall x: T | P(x) :: Q(x) && R(x)) ==> forall y: T | !Q(y) :: !P(y);
+}
 // END-TODO(ExerciseB)
 
 
 // BEGIN-TODO(ExerciseD)
 // Add your changed signature here.
+lemma Ex5bisbis<T>(P: T -> bool, Q: T -> bool, R: T -> bool)
+  requires (forall x: T | P(x) :: (Q(x) && R(x)))
+  ensures {:axiom} forall y: T | !Q(y) :: !P(y)
 // END-TODO(ExerciseD)
 
 // Good luck!!

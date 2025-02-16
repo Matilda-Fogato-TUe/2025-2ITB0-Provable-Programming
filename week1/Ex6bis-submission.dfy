@@ -1,7 +1,7 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
 // <Full name 1>: <Student number 1>
-// <Full name 2>: <Student number 2>
+// Matilda Fogato: 1656376
 // END-TODO(Name)
 
 
@@ -23,11 +23,23 @@
  * pre- and postconditions.  */
 
 lemma Ex6bis<T>(P: T -> bool, Q: T -> bool, R: T -> bool)
-    ensures ((exists x: T | P(x) :: Q(x)) && (forall y: T | Q(y) :: R(y)))
-            ==>  exists z: T | P(z) :: R(z)
+  ensures ((exists x:T | P(x) :: Q(x)) && (forall y:T | Q(y) :: R(y)))
+          ==>  exists z:T | P(z) :: R(z)
 
-// BEGIN-TODO(ExerciseB)
-// Add your derivation here.
+  // BEGIN-TODO(ExerciseB)
+  // Add your derivation here.
+{
+  if ((exists x: T | P(x) :: Q(x)) && (forall y: T | Q(y) :: R(y))) {
+    forall y: T | Q(y) ensures R(y) {
+      ghost var x: T :| P(x) && Q(x);
+      assert P(x) && Q(x);
+      assert R(x);
+    }
+    assert exists z: T | P(z) :: R(z);
+  }
+  assert ((exists x: T | P(x) :: Q(x)) && (forall y: T | Q(y) :: R(y))) ==> exists z: T | P(z) :: R(z);
+}
+
 // END-TODO(ExerciseB)
 
 // BEGIN-TODO(ExerciseD)

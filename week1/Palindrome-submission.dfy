@@ -1,7 +1,7 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
 // <Full name 1>: <Student number 1>
-// <Full name 2>: <Student number 2>
+// Matilda Fogato: 1656376
 // END-TODO(Name)
 
 
@@ -14,6 +14,15 @@
  * Implement it recursively and see that it verifies. */
 method IsPalindrome(a: string) returns (p: bool)
   ensures p <==> forall i | 0 <= i < |a| / 2 :: a[i] == a[|a| - 1 - i]
-// BEGIN-TODO(Implementation)
-// Add your implementation here.
+  // BEGIN-TODO(Implementation)
+  // Add your implementation here.
+{
+  if |a| <= 1 {
+    p := true;
+  } else {
+    var rec := IsPalindrome(a[1..|a| - 1]);
+    p := a[0] == a[|a| - 1] && rec;
+  }
+  assert p <==> forall i | 0 <= i < |a| / 2 :: a[i] == a[|a| - 1 - i];
+}
 // END-TODO(Implementation)

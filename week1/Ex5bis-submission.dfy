@@ -46,7 +46,18 @@ lemma Ex5bis<T>(P: T -> bool, Q: T -> bool, R: T -> bool)
 // Add your changed signature here.
 lemma Ex5bisbis<T>(P: T -> bool, Q: T -> bool, R: T -> bool)
   requires (forall x: T | P(x) :: (Q(x) && R(x)))
-  ensures {:axiom} forall y: T | !Q(y) :: !P(y)
+  ensures forall y: T | !Q(y) :: !P(y)
+{
+  forall y: T | !Q(y) ensures !P(y) {
+    if (P(y)) {
+      assert Q(y) && R(y);
+      assert Q(y);
+      assert false;
+    }
+    assert !P(y);
+  }
+  assert (forall y: T | !Q(y) :: !P(y));
+}
 // END-TODO(ExerciseD)
 
 // Good luck!!

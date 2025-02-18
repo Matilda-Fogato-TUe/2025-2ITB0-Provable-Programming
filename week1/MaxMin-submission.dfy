@@ -1,6 +1,6 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// <Full name 1>: <Student number 1>
+// Jip Melle Verkoulen: 1836587
 // Matilda Fogato: 1656376
 // END-TODO(Name)
 

@@ -1,6 +1,6 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// <Full name 1>: <Student number 1>
+// Jip Melle Verkoulen: 1836587
 // Matilda Fogato: 1656376
 // END-TODO(Name)
 
@@ -14,8 +14,8 @@
  * Implement it recursively and see that it verifies. */
 method IsPalindrome(a: string) returns (p: bool)
   ensures p <==> forall i | 0 <= i < |a| / 2 :: a[i] == a[|a| - 1 - i]
-  // BEGIN-TODO(Implementation)
-  // Add your implementation here.
+// BEGIN-TODO(Implementation)
+// Add your implementation here.
 {
   if |a| <= 1 {
     p := true;

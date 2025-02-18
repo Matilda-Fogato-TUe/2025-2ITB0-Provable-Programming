@@ -1,6 +1,6 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// <Full name 1>: <Student number 1>
+// Jip Melle Verkoulen: 1836587
 // Matilda Fogato: 1656376
 // END-TODO(Name)
 
@@ -25,10 +25,10 @@
 
 
 method AllZero(a: seq<int>) returns (r: bool)
-  decreases |a|
-  // BEGIN-TODO(Method)
-  // Add the specification and the method body here.
+// BEGIN-TODO(Method)
+// Add the specification and the method body here.
   ensures r == (forall i :: 0 <= i < |a| ==> a[i] == 0)
+  decreases |a|
 {
   if |a| == 0 {
     r := true;

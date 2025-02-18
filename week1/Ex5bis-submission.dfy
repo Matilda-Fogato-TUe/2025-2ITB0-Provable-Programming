@@ -1,6 +1,6 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// <Full name 1>: <Student number 1>
+// Jip Melle Verkoulen: 1836587
 // Matilda Fogato: 1656376
 // END-TODO(Name)
 
@@ -24,7 +24,7 @@
 
 lemma Ex5bis<T>(P: T -> bool, Q: T -> bool, R: T -> bool)
   ensures (forall x: T | P(x) :: (Q(x) && R(x))) ==> forall y: T | !Q(y) :: !P(y)
-  //   // BEGIN-TODO(ExerciseB)
+// BEGIN-TODO(ExerciseB)
 {
   if (forall x: T | P(x) :: (Q(x) && R(x))) {
     forall y: T | !Q(y) ensures !P(y) {

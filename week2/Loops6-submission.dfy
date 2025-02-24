@@ -1,8 +1,8 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// Group <Group number>
-// <Full name 1>: <Student number 1>
-// <Full name 2>: <Student number 2>
+// Group 36
+// Matilda Fogato: 1656376
+// Jip Melle Verkoulen: 1836587
 //
 // You got this!!
 //

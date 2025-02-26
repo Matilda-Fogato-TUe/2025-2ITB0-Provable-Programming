@@ -24,7 +24,6 @@
  * and allows you to prove the assertion after the loop. */
 method Solution()
   // BEGIN-TODO(Solution)
-  // Add the specification and the method body here.
 {
   var x := 0;
   while x < 100

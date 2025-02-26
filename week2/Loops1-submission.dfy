@@ -21,23 +21,9 @@
  *     invariant x % 2 == 0
  * assert x == 10; */
 method TestB()
-  // BEGIN-TODO(TestB)
-  // Add the specification and the method body here.
-  // loop-use: YES
-  // assertion: NO
-{
-  var x := 20;
-  while 10 < x
-    invariant x % 2 == 0
-    decreases x
-  {
-    //{{x % 2 ==0 && 10 < x}}
-    x := x - 2;
-    // {{x % 2 == 0}}
-  }
-  assert x == 10;
-}
-
+// BEGIN-TODO(TestB)
+// loop-use: YES
+// assertion: NO
 // END-TODO(TestB)
 
 
@@ -47,21 +33,9 @@ method TestB()
  *     invariant x % 2 == 0
  * assert x == 20; */
 method TestC()
-  // BEGIN-TODO(TestC)
-  // Add the specification and the method body here.
-  // loop-use: YES
-  // assertion: NO
-{
-  var x := 20;
-  while x < 20
-    invariant x % 2 == 0
-  {
-    // {{x % 2 == 0 && x < 20}}
-    x := x + 2;
-    // {{x % 2 == 0}}
-  }
-  assert x == 20;
-}
+// BEGIN-TODO(TestC)
+// loop-use: YES
+// assertion: NO
 // END-TODO(TestC)
 
 
@@ -72,19 +46,6 @@ method TestC()
  * assert x == 25; */
 method TestG()
   // BEGIN-TODO(TestG)
-  // Add the specification and the method body here.
   // loop-use: YES
   // assertion: NO
-{
-  var x := 0;
-  while x < 100
-    invariant 0 <= x < 100
-  {
-    // {{0 <= x < 100 && x < 100}}
-    //x := x;
-    // {{0 <= x <100}}
-  }
-  assert x == 25;
-}
-
 // END-TODO(TestG)

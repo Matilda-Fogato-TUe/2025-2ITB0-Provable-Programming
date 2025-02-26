@@ -23,16 +23,13 @@
 /* (a) WP(x := 3y − 2x, x <= y) */
 method A(x: int, y: int) returns (x': int)
   // BEGIN-TODO(MethodA)
-  // Add the specification and the method body here.
-  // WP [x := 3y - 2x, x <= y]
-  // = WP [y <=x]
-  // {{y <= x}} x := 3y - 2x {{x <= y}}
-  requires y <= x
-  ensures x' <= y
+  // WP [x := 3y - 2x, x <= y] = WP [y <=x]
+  //requires y <= x
+  //ensures x' <= y
 {
-  //assume y <= x;
+  assume y <= x;
   x' := 3*y - 2*x;
-  //assert x' <=y;
+  assert x' <=y;
 }
 
 // END-TODO(MethodA)
@@ -43,27 +40,16 @@ method A(x: int, y: int) returns (x': int)
 method E(m: int, n: int, s: seq<int>) returns (m': int, n': int)
   // BEGIN-TODO(MethodE)
 {
-  // Declare local variables with arbitrary initial values
-  var mm := m;
-  var nn := n;
+  //assumptions required for 'given that' to be true.
+  n':= n;
+  m':= m;
 
-  // Final formulation of our weakest precondition
-  assume n < |s| && forall i :: 0 <= i < nn ==> s[i] <= s[nn];
+  assume n' < |s|;
+  assume forall i | 0 <= i < n :: s[i] <= s[n'];
 
-  // Perform the first assignment
-  mm := nn;
-
-  // Direct result of substitution for m := n
-  assert forall i :: 0 <= i < nn ==> s[i] <= s[mm];
-
-  // Perform the second assignment
-  nn := nn + 1;
-
-  // Check that the new state still satisfies the postcondition
-  assert forall i :: 0 <= i < nn ==> s[i] <= s[mm];
-
-  // Finally, assign to out-parameters
-  m' := mm;
-  n' := nn;
+  m' := n';
+  assert forall i | 0 <= i < n' :: s[i] <= s[m'];
+  n' := n' + 1;
+  assert forall i | 0 <= i < n' :: s[i] <= s[m'];
 }
 // END-TODO(MethodE)

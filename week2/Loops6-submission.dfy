@@ -26,7 +26,6 @@
  * technique 11.0 of omitting a conjunct. */
 method CubicRoot0(N: nat) returns (r: nat)
   // BEGIN-TODO(Version1)
-  // Add the specification and the method body here.
   ensures r * r * r <= N < (r + 1) * (r + 1) * (r + 1)
 {
   r := 0;
@@ -40,7 +39,6 @@ method CubicRoot0(N: nat) returns (r: nat)
  * cycle of the loop (r + 1) * (r + 1) * (r + 1) is calculated. */
 method CubicRoot1(N: nat) returns (r: nat)
   // BEGIN-TODO(Version2)
-  // Add the specification and the method body here.
   ensures r * r * r <= N < (r + 1) * (r + 1) * (r + 1)
 {
   r := 0;
@@ -59,7 +57,6 @@ method CubicRoot1(N: nat) returns (r: nat)
  * cycle of the loop. */
 method CubicRoot2(N: nat) returns (r: nat)
   // BEGIN-TODO(Version3)
-  // Add the specification and the method body here.
   ensures r * r * r <= N < (r + 1) * (r + 1) * (r + 1)
 {
   r := 0;
@@ -80,7 +77,6 @@ method CubicRoot2(N: nat) returns (r: nat)
  * addition. */
 method CubicRoot3(N: nat) returns (r: nat)
   // BEGIN-TODO(Version4)
-  // Add the specification and the method body here.
   ensures r * r * r <= N < (r + 1) * (r + 1) * (r + 1)
 {
   r := 0;

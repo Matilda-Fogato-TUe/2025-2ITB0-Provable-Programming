@@ -25,6 +25,9 @@
  *  } */
 method Ex(x: int, y: int) returns (y': int)
   // BEGIN-TODO(Method)
+  // Add the specification and the method body here.
+  requires x < 8 ==> x != 5
+  ensures y' < 10
 {
   assume x < 8 ==> x != 5;
   if x < 8 {

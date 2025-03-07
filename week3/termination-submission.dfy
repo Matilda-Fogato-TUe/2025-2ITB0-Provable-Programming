@@ -2,9 +2,11 @@ method terminate_x_y(N: nat)
 {
   var x, y := 0, 0;
   while x != 0 || y != N
-// BEGIN-TODO(Termination)
-// Add your termination proof here.
-// END-TODO(Termination)
+    // BEGIN-TODO(Termination)
+    // Add your termination proof here.
+    decreases N - y, x
+    invariant 0 <= y <= N
+    // END-TODO(Termination)
   {
     if
     {

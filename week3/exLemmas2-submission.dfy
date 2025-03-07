@@ -1,6 +1,6 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// Group <Group number>
+// Group 36
 // Matilda Fogato: 1656376
 // Jip Melle Verkoulen: 1836587
 //

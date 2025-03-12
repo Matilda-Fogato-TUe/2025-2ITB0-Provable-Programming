@@ -50,13 +50,13 @@ lemma PowProperty(x: int, a: nat, b:nat)
     } else {
         calc {
             pow(x, b);
-            == //Def. pow for n := b
+            == // def. pow for n := b
             x * pow(x, b - 1);
             == {PowProperty(x, a, b-1);}
             x * (pow(x, a) * pow(x, b - a - 1));
-            == //Rearrange
+            == // rearrange
             pow(x, a) * x * pow(x, b - a - 1);
-            == //Def. pow for n := b - 1
+            == // def. pow for n := b - 1
             pow(x, a) * pow(x, b - a);
         }
     }
@@ -66,24 +66,19 @@ lemma polyval_double_slicing(a: seq<int>, x:int, i:nat, j: nat)
     requires 0 <= i < j <= |a|
     ensures polyval(a[i..j], x) == polyval(a[i..j-1], x) + a[j-1] * pow(x, j-i-1)
 {
-    // Step 1: Show that a[i..j] is the concatenation of a[i..j-1] and [a[j-1]]
+    // can slice the last element
     assert a[i..j] == a[i..j-1] + [a[j-1]];
+    // assert lengths
+    var d := |a[i..j]| - 1;
+    assert d == j - i - 1;
 
-    // Step 2: Apply the definition of polyval to a[i..j]
-    var d := |a[i..j]| - 1; // Degree of the polynomial
-    assert d == j - i - 1; // Since |a[i..j]| = j - i
-
-    // Step 3: Expand polyval(a[i..j], x) using its definition
     assert polyval(a[i..j], x) == polyval(a[i..j-1], x) + a[j-1] * pow(x, d);
-
-    // Step 4: Substitute d = j - i - 1
     assert polyval(a[i..j], x) == polyval(a[i..j-1], x) + a[j-1] * pow(x, j-i-1);
-
 }
 
 function polyseg(a: seq<int>, x: int, lo: nat, hi: nat): int
-  requires hi <= |a| && |a| > lo >= 0 && lo < hi // Ensure hi is within bounds
-  ensures polyseg(a, x, lo, hi) == pow(x, lo) * polyval(a[lo..hi], x) // Postcondition
+  requires hi <= |a| && |a| > lo >= 0 && lo < hi
+  ensures polyseg(a, x, lo, hi) == pow(x, lo) * polyval(a[lo..hi], x)
 {
   if lo >= hi-1 then
     var res := a[lo] * pow(x, lo);
@@ -91,11 +86,15 @@ function polyseg(a: seq<int>, x: int, lo: nat, hi: nat): int
   else 
     var r := polyseg(a, x, lo, hi-1);
     var res := r + a[hi-1] * pow(x, hi-1);
+    // reference for def. of polyseg (method body)
+    // polyseg(a, x, lo, hi) == res == polyseg(a, x, lo, hi-1) + a[hi-1] * pow(x, hi-1);
+
+    // prove postcondition
     calc{
         res;
-        == //Def. res
+        == // def. res
         r + a[hi-1] * pow(x, hi-1);
-        == //Def. r
+        == // def. r
         polyval(a[lo..hi-1], x) * pow(x, lo) + a[hi-1] * pow(x, hi-1);
         == {PowProperty(x, lo, hi - 1);}
         pow(x, lo) * (polyval(a[lo..hi-1], x) + a[hi-1] * pow(x, hi-lo-1));
@@ -105,15 +104,8 @@ function polyseg(a: seq<int>, x: int, lo: nat, hi: nat): int
     res
 }
 
-lemma polyseg_Equals_Polyval(a: seq<int>, x:int) 
-    requires |a| > 0
-    ensures polyseg(a, x, 0, |a|) == polyval(a, x)
-{
-    assert polyseg(a, x, 0, |a|) == polyval(a, x);
-}
-
-lemma polyseg_decomposition(a: seq<int>, x: int, lo: nat, hi: nat)
-  requires hi <= |a| && |a| > lo >= 0 && lo < hi - 1 // Ensure hi is within bounds
+lemma left_polyseg_decomposition(a: seq<int>, x: int, lo: nat, hi: nat)
+  requires hi <= |a| && |a| > lo >= 0 && lo < hi - 1
   ensures polyseg(a, x, lo, hi) == a[lo] * pow(x, lo) + polyseg(a, x, lo+1, hi)
 {
     if lo == hi - 2 {
@@ -122,11 +114,11 @@ lemma polyseg_decomposition(a: seq<int>, x: int, lo: nat, hi: nat)
     } else {
         calc {
             polyseg(a, x, lo, hi);
-            == //Def. polyseg
+            == // def. polyseg for hi, lo := hi, lo (method body)
             polyseg(a, x, lo, hi-1) + a[hi-1] * pow(x, hi-1);
-            == {polyseg_decomposition(a, x, lo, hi - 1);}
+            == {left_polyseg_decomposition(a, x, lo, hi - 1);}
             a[lo] * pow(x, lo) + polyseg(a, x, lo+1, hi - 1) + a[hi-1] * pow(x, hi-1);
-            ==
+            == // def. polyseg for hi, lo := hi, lo + 1 (method body)
             a[lo] * pow(x, lo) + polyseg(a, x, lo+1, hi);
         }
     }
@@ -197,13 +189,13 @@ method Horner(a: seq<int>, x: int) returns (r: int)
             invariant r * pow(x, i) == polyseg(a, x, i, |a|)
             decreases i
         {
-            //keep old variable to prove maintenance more easily
+            // keep old variable to prove maintenance more easily
             var r_old := r;
 
             i := i - 1;
             r := a[i] + x * r;
-            
-            //proof maintenance
+
+            // proof maintenance
             calc {
                 r * pow(x, i);
                 ==
@@ -212,7 +204,7 @@ method Horner(a: seq<int>, x: int) returns (r: int)
                 a[i] * pow(x, i) + x * pow(x, i) * r_old;
                 == {assert pow(x, i + 1) * r_old == polyseg(a, x, i + 1, |a|);}
                 a[i] * pow(x, i) + polyseg(a, x, i + 1, |a|);
-                == {polyseg_decomposition(a, x, i, |a|);}
+                == {left_polyseg_decomposition(a, x, i, |a|);}
                 polyseg(a, x, i, |a|);
             }
         }

@@ -74,7 +74,8 @@ lemma ExC(x: int)
   <
      7 * x + 12;
      // x * x is non-negative
-  <= x * x + 7 * x + 12;
+  <= {assert 0 <= x * x;}
+     x * x + 7 * x + 12;
   ==
      (x + 3) * (x + 4);
      // END-TODO(CalcC)

@@ -19,29 +19,30 @@ lemma MultCommutative(x: nat, y: nat)
   // BEGIN-TODO(MultComm)
   // Write a proof for the commutativity of multiplication based on the
   // specification given in `Mult`.
-  if x == 0 || y == 0 {
-    // Base case
-    assert Mult(x, y) == 0;
-    assert Mult(y, x) == 0;
-  } else {
-    // Inductive step
-    calc {
-      Mult(x, y);
-    ==
-      x + Mult(x, y - 1); // Apply definition of Mult
-    ==
-      {
-        MultCommutative(x, y - 1); // Induction hypothesis
-        assert Mult(x, y - 1) == Mult(y - 1, x);
-      }
-      x + Mult(y - 1, x); // Apply induction hypothesis
-    ==
-      x + (y - 1) + Mult(y - 1, x - 1); // Apply definition of Mult
-    ==
-      y + Mult(y, x -1); // Simplify
-    ==
-      Mult(y, x); // Apply definition of Mult
+  if x == y {
+        assert Mult(x,y) == Mult(y, x);
+    } else if x == 0 {
+        MultCommutative(x, y - 1);
+    } else if y == 0 {
+        MultCommutative(y, x - 1);
+    } else {
+        calc {
+            Mult(x, y);
+            == // Def. Mult
+            x + Mult(x, y - 1);
+            == {MultCommutative(x, y - 1);}
+            x + Mult(y - 1, x);
+            == // Def. Mult
+            x + y - 1 + Mult(y - 1, x - 1);
+            == {MultCommutative(y - 1, x - 1);}
+            y + x - 1 + Mult(x - 1, y - 1);
+            == // Def. Mult
+            y + Mult(x - 1, y);
+            == {MultCommutative(x - 1, y);}
+            y + Mult(y, x - 1);
+            == // Def. Mult
+            Mult(y, x);
+        }
     }
-  }
   // END-TODO(MultComm)
 }

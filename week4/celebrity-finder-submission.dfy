@@ -1,8 +1,8 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// Group <Group number>
-// <Full name 1>: <Student number 1>
-// <Full name 2>: <Student number 2>
+// Group 36
+// Matilda Fogato: 1656376
+// Jip Melle Verkoulen: 1836587
 //
 // Good luck!
 //
@@ -17,45 +17,47 @@ module CelebrityFinderModule
 
   predicate isCelebrity(people: People, p: Person)
   {
-// BEGIN-TODO(IsCelebrity)
-// Implement the `isCelebrity` predicate according to the instructions.
-   (forall p' | p' in people && p' != p :: knows(p', p)) && (forall p' | p' in people && p' != p :: !knows(p, p'))
-// END-TODO(IsCelebrity)
-  }    
+    // BEGIN-TODO(IsCelebrity)
+    // Implement the `isCelebrity` predicate according to the instructions.
+    p in people &&
+    (forall q: Person :: (q in people && p != q) ==> knows(q, p)) &&
+    (forall q: Person :: (q in people && p != q) ==> (!knows(p, q)))
+    // END-TODO(IsCelebrity)
+  }
 
   method FindCelebrity(people: People) returns (result: Person)
-// BEGIN-TODO(FindCelebrity)
-    requires exists p | p in people :: isCelebrity(people, p)
+    // BEGIN-TODO(FindCelebrity)
+    // Implement the `FindCelebrity` method according to the instructions.
+    requires people != {}
+    requires (exists c: Person :: c in people && isCelebrity(people, c))
     ensures isCelebrity(people, result)
+  {
+    // Initialize a set C with all people in the community
+    var C := people;
+    // Initialize a candidate celebrity by removing an arbitrary person from C
+    var a: Person :| a in C;
+    C := C - {a};
+    // Initialize an arbitrary person b
+    var b: Person;
+    // While C is not empty:
+    // Remove an arbitrary person b from C
+    // Check if a knows b
+    // If a knows b, update the candidate celebrity to b
+    // When the loop terminates, a is the celebrity
+    while C != {}
+      invariant isCelebrity(people, a) || (exists p: Person :: p in C && isCelebrity(people, p))
+      invariant a in people && a !in C
+      invariant C <= people
+      decreases |C|
     {
-      var C := people;
-      var a: Person;
-      var b: Person;
-      a :| a in C;
-      C := C - {a};
-      while |C| > 0 
-        invariant isCelebrity(people, a) || exists p | p in C :: isCelebrity(people, p)
-        invariant C <= people
-        invariant a !in C && a in people
-      {
-        b :| b in C;
-        C := C - {b};
-        assert isCelebrity(people, a) || exists p | p in C + {b} :: isCelebrity(people, p);
-        if (knows(a, b)) {
-          assert !isCelebrity(people, a);
-          assert exists p | p in C + {b} :: isCelebrity(people, p);
-          a := b;
-          // a was not a celebrity, but it knows b, so either b is a celebrity, or there must be another celebrity in C
-          assert isCelebrity(people, a) || exists p | p in C :: isCelebrity(people, p);
-        } else {
-          assert !isCelebrity(people, b);
-          // b was not a celebrity, so he can safely be removed from C without affecting the presence of a celebrity
-          assert isCelebrity(people, a) || exists p | p in C :: isCelebrity(people, p);
-        }
+      b :| b in C;  // Remove an arbitrary person b from C
+      C := C - {b};
+      if knows(a, b) {
+        a := b;  // Update the candidate celebrity to b
       }
-      assert isCelebrity(people, a);
-      result := a;
     }
-// END-TODO(FindCelebrity)
+    result := a;
+  }
+  // END-TODO(FindCelebrity)
 
 }

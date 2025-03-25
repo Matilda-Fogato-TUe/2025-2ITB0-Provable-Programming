@@ -1,8 +1,8 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// Group <Group number>
-// <Full name 1>: <Student number 1>
-// <Full name 2>: <Student number 2>
+// Group 36
+// Matilda Fogato: 1656376
+// Jip Melle Verkoulen: 1836587
 //
 // Good luck!
 //
@@ -25,6 +25,8 @@ predicate IsSwedishFlagColor(c : Color)
 predicate IsSwedishColoredTree(t: ColoredTree)
 {
 // BEGIN-TODO(IsSwedishColorTree)
-// Implement the `IsSwedishColoredTree` predicate according to the instructions.
+match t
+case Leaf(color) => IsSwedishFlagColor(color)
+case Node(left, right) => IsSwedishColoredTree(left) && IsSwedishColoredTree(right)
 // END-TODO(IsSwedishColorTree)
 }

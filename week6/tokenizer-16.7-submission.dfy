@@ -34,6 +34,7 @@ predicate Is(ch: char, cat: Category)
 
 // BEGIN-TODO(Extra)
 // Space for extra functions and lemmas (optional)
+
 // END-TODO(Extra)
 
 class Tokenizer {
@@ -51,7 +52,12 @@ class Tokenizer {
     // BEGIN-TODO(Invariant)
     // The invariant expresses that suffix is the unprocessed part of source starting at m
     // and that n is the total number of characters processed (n = m+j).
-    m <= |source| && suffix == source[m..] && n == m + j
+    0 <= m <= |source|
+    && 0 <= j <= |suffix|
+    && n <= |source|
+    && suffix == source[m..]
+    && n == m + j
+    && source == source[..m] + suffix
     // END-TODO(Invariant)
   }
 
@@ -81,25 +87,48 @@ class Tokenizer {
     ensures token == source[p..n]
   {
     // BEGIN-TODO(Read)
+
     ghost var oldN := n;
+    assert n == m + j;
+
 
     // skip whitespace
     while j < |suffix| && Is(suffix[j], Whitespace)
       invariant Valid()
-      invariant oldN <= n <= |source|
-      invariant forall i :: oldN <= i < n ==> Is(source[i], Whitespace)
+      invariant old(j) <= j <= |suffix|
+      invariant forall i :: old(j) <= i < j ==> Is(suffix[i], Whitespace)
+      invariant forall i :: old(n) <= i < m + j ==> Is(source[i], Whitespace)
+      invariant n == m + j && m <= |source|
+      invariant suffix == source[m..]
+      invariant old(m) == m
     {
       j := j + 1;
       n := m + j;
     }
 
     // set p to the position after the whitespace
-    p := n;
+    p := j + m;
+
+    assert oldN == old(n);
+    assert p == n;
+    assert IsWhitespaceRange(oldN, p);
+
+    // Establish and save the whitespace property here, close to where it was proven
+    ghost var allWhitespaceBeforeP := forall i :: old(n) <= i < p ==> Is(source[i], Whitespace);
+    assert allWhitespaceBeforeP;
 
     // check for end of string
-    if j >= |suffix| {
+    if j == |suffix| {
+      assert suffix == source[m..];
+      assert p == j + m;
+      assert |suffix| == |source| - m;
+      assert j == |suffix| ==> j + m == |source|;
+      assert p == n;
+      assert p == |source|;
       cat := End;
       token := "";
+      assert IsWhitespaceRange(oldN, p);
+      assert allWhitespaceBeforeP;
       return;
     }
 
@@ -113,17 +142,36 @@ class Tokenizer {
       cat := Operator;
     } else {
       cat := Error;
+      token := "";
+      assert p == n == m + j;
+      assert IsWhitespaceRange(oldN, p);
+      assert allWhitespaceBeforeP;
+      assert token == source[p..n];
+      return;
     }
 
     // read all consecutive characters of the same category
     var start := j;
     j := j + 1;
-    n := m + j;
+    n := n + 1;
+
+    assert j == start + 1;
+    assert start < j;
+    assert suffix[start] == ch;  // The first character is of the right category
+    assert Is(suffix[start], cat);  // Explicit about the category
+    assert p == start + m;  // Connect p to start
+    assert m + start < m + j;  // Help relate positions
+    assert p < n;  // Explicit about p being less than n
 
     while j < |suffix| && Is(suffix[j], cat)
       invariant Valid()
-      invariant p + ( j - start) == n
-      invariant forall i :: p <= i < n ==> Is(source[i], cat)
+      invariant p - m <= j <= |suffix|
+      invariant forall i :: start <= i < j ==> Is(suffix[i], cat)
+      invariant forall i :: p <= i < m + j ==> Is(source[i], cat)
+      invariant n == m + j
+      invariant p == start + m
+      invariant suffix == source[m..]
+      invariant start < j
     {
       j := j + 1;
       n := m + j;
@@ -131,6 +179,37 @@ class Tokenizer {
 
     // extract the token
     token := suffix[start..j];
+    assert p == start + m;
+    assert n == j + m;
+    assert source[p..n] == suffix[start..j];
+    assert token == source[p..n];
+    assert start < j;  // This is true because we've processed at least one character
+    assert p < n;  // This follows from the previous assertions
+    assert cat != Whitespace;  // This is true because we are not in the whitespace case
+    assert cat != End && cat != Error;  // This is true in the normal case
+    assert (cat == End || cat == Error) <==> p == n;  // This confirms the biconditional
+    if j < |suffix| {
+      assert !Is(suffix[j], cat);
+      assert source[n] == suffix[j];
+      assert !Is(source[n], cat);
+    } else {
+      assert j == |suffix|;  // This is true because we've processed all characters
+      assert n == |source|;
+      assert suffix == source[m..];
+      assert m + j == |source|;  // This confirms the end of the string
+    }
+    assert allWhitespaceBeforeP;
+
+    // Verify all ensures clauses are satisfied
+    assert cat == End || cat == Error || Valid();
+    assert cat != Whitespace;
+    assert old(n) <= p <= n <= |source|;
+    assert cat == End <==> p == |source|;
+    assert cat == End || cat == Error <==> p == n;
+    assert allWhitespaceBeforeP;
+    assert forall i :: p <= i < n ==> Is(source[i], cat);
+    assert p < n ==> (n == |source| || !Is(source[n], cat));
+    assert token == source[p..n];
 
     // END-TODO(Read)
   }
@@ -141,14 +220,26 @@ class Tokenizer {
     ensures Valid() && source == old(source[m..]) == suffix
   {
     // BEGIN-TODO(Prune)
+    ghost var oldSource := source;
+    ghost var oldM := m;
+    assert suffix == source[m..];
     source := suffix;
     var oldJ := j;
     m := 0;
     n := j;
+    assert source == oldSource[oldM..];
+    assert suffix == source;
+    assert Valid();
     // END-TODO(Prune)
   }
 
   // BEGIN-TODO(Methods)
-  // Space for extra methods (optional)
+  ghost predicate IsWhitespaceRange(start: nat, end: nat)
+    requires start <= end
+    requires end <= |source|
+    reads this
+  {
+    forall i {:trigger source[i]} :: start <= i < end ==> Is(source[i], Whitespace)
+  }
   // END-TODO(Methods)
 }

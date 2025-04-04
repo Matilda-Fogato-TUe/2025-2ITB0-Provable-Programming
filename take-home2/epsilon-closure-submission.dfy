@@ -1,8 +1,8 @@
 // BEGIN-TODO(Name)
 // Please, before you do anything else, add your names here:
-// Group <Group number>
-// <Full name 1>: <Student number 1>
-// <Full name 2>: <Student number 2>
+// Group 36
+// Matilda Fogato: 1656376
+// Jip Melle Verkoulen: 1836587
 //
 // Good luck!
 //
@@ -153,37 +153,118 @@ abstract module NFAAlgorithmsModule refines NFAModule
   lemma SimpleEpsilonPathLemma(N: NFA, r: seq<State>)
     requires is_epsilon_path(N, r)
     ensures exists r1: seq<State> :: is_epsilon_path(N, r1) && is_simple_path(r1) && r1[0] == r[0] && r1[|r1|-1] == r[|r|-1]
-// BEGIN-TODO(SimpleEpsilonLemma)
-// Prove this lemma by adding a body.
-// END-TODO(SimpleEpsilonLemma)
+    // BEGIN-TODO(SimpleEpsilonLemma)
+    // Prove this lemma by adding a body.
+  {
+    if is_simple_path(r) {
+      // r is already simple
+    } else {
+      // since r is not simple, there exists i, j such that r[i] == r[j]
+      // and 0 <= i < j < |r| - 1
+      var i, j :| 0 <= i < j < |r| && r[i] == r[j];
+      // remove the cycle by concatenating the prefix of r up to i with the suffix of r from j
+      var rprime := r[..i] + r[j..];
+      // endpoints are preserved
+      assert rprime[0] == r[0];
+      assert rprime[|rprime|-1] == r[|r|-1];
 
-// BEGIN-TODO(Extra)
-// Space for extra functions and lemmas (optional)
-// END-TODO(Extra)
+      assert is_epsilon_path(N, rprime)
+      by {
+        // rprime is a subsequence of r
+        assert is_restricted_path(rprime, N.Q);
+        assert |rprime| > 0;
+        // all transitions in rprime are also in r
+        assert forall k | 0 <= k < |rprime| - 1 :: ((rprime[k], epsilon) in N.delta.Keys && rprime[k + 1] in N.delta[(rprime[k], epsilon)]);
+      }
+      // we removed at least one state, so |rprime| < |r|
+      assert |rprime| < |r|;
+
+      // by induction hypothesis, there exists a simple epsilon-path r1 with the same endpoints as rprime
+      SimpleEpsilonPathLemma(N, rprime);
+    }
+  }
+  // END-TODO(SimpleEpsilonLemma)
+
+  // BEGIN-TODO(Extra)
+  // Space for extra functions and lemmas (optional)
+  lemma DiscoveredUnionSubset(N: NFA, q: State, discovered_old: set<State>, Q1: set<State>)
+    requires discovered_old <= epsilon_closure(N, q)
+    requires forall r :: r in Q1 ==> r in epsilon_closure(N, q)
+    ensures discovered_old + Q1 <= epsilon_closure(N, q)
+  {
+    // The union of two subsets of epsilon_closure(N, q) is itself a subset of epsilon_closure(N, q).
+  }
+
+  lemma EpsilonTransitionPreservesClosure(N: NFA, q: State, p: State, r: State)
+    requires p in epsilon_closure(N, q)
+    requires (p, epsilon) in N.delta
+    requires r in N.delta[(p, epsilon)]
+    ensures r in epsilon_closure(N, q)
+  {
+    // Let the path r1 be the sequence of states from q to p.
+    var r1 :| is_epsilon_path(N, r1) && r1[0] == q && r1[|r1|-1] == p;
+    // The path r1 is an epsilon-path because it is a sequence of states connected by epsilon-transitions.
+
+    // Concatenate r1 with the state [r] to form a new path r2.
+    var r2 := r1 + [r];
+
+    // The path r2 is an epsilon-path because it consists of the original epsilon-transitions from q to p,
+    // followed by the epsilon-transition from p to r.
+    // Therefore, r is in epsilon_closure(N, q) because there exists an epsilon-path from q to r.
+    assert r2[0] == q;
+    assert r2[|r2|-1] == r;
+    assert |r2| > 0;
+    assert forall i | 0 <= i < |r2| - 1 :: ((r2[i], epsilon) in N.delta.Keys && r2[i + 1] in N.delta[(r2[i], epsilon)]);
+    assert is_epsilon_path(N, r2);
+    assert r in epsilon_closure(N, q);
+
+  }
+
+  lemma SuffixOfEpsilonPathIsEpsilonPath(N: NFA, path: seq<State>, i:nat)
+    requires is_epsilon_path(N, path)
+    requires 0 <= i < |path|
+    ensures is_epsilon_path(N, path[i..])
+  {
+    assert is_restricted_path(path[i..], N.Q);
+    assert |path[i..]| > 0;
+  }
+
+  // END-TODO(Extra)
 
   method nfa_epsilon_closure(N: NFA, q: State) returns (discovered: set<State>)
-// BEGIN-TODO(RemoveDecreases)
-// After adding a decreases clause to the while loop below, this `decreases *` clause should be removed.
-    decreases *
-// END-TODO(RemoveDecreases)
+    // BEGIN-TODO(RemoveDecreases)
+    // END-TODO(RemoveDecreases)
     requires q in N.Q
     ensures discovered == epsilon_closure(N, q)
   {
     discovered := {q};
     var todo := {q};
 
-// BEGIN-TODO(EntryCondition)
-// Eliminate these assume statements.
-    assume todo <= discovered <= epsilon_closure(N, q);
-    assume epsilon_closure(N, q) <= discovered + EC(N, todo);
-    assume E(N, discovered - todo) <= discovered;
-// END-TODO(EntryCondition)
+    // BEGIN-TODO(EntryCondition)
+    assert todo <= discovered;
+    assert q in discovered;
+    assert q in epsilon_closure(N, q)
+    by {
+      var path := [q];
+      assert |path| > 0;
+      assert is_restricted_path(path, N.Q);
+      assert is_epsilon_path(N, path);
+    }
+    assert todo == {q};
+    assert todo <= epsilon_closure(N, q);
+    assert discovered <= epsilon_closure(N, q);
+    // States not in 'discovered' but still in epsilon_closure(N, q) must come from a state in 'todo',
+    // so they fall under EC(N, todo). This justifies the subset relation:
+    assert epsilon_closure(N, q) <= discovered + EC(N, todo);
+    assert E(N, discovered - todo) <= discovered;
+    // END-TODO(EntryCondition)
 
     while |todo| > 0
-// BEGIN-TODO(Termination)
-// Replace `*` with an appropriate decreases clause to ensure termination.
-      decreases *
-// END-TODO(Termination)
+      // BEGIN-TODO(Termination)
+      // Replace `*` with an appropriate decreases clause to ensure termination.
+      decreases (|epsilon_closure(N, q)| - |discovered|, |todo|)
+      invariant q in discovered
+      // END-TODO(Termination)
       invariant todo <= discovered <= epsilon_closure(N, q)
       invariant epsilon_closure(N, q) <= discovered + EC(N, todo)
       invariant E(N, discovered - todo) <= discovered
@@ -195,26 +276,82 @@ abstract module NFAAlgorithmsModule refines NFAModule
       {
         var Q1 := N.delta[(p, epsilon)] - discovered;
 
-// BEGIN-TODO(Invariant1)
-// Eliminate this assume statement.
-        assume Q1 <= epsilon_closure(N, q);
-// END-TODO(Invariant1)
+        // BEGIN-TODO(Invariant1)
+        if Q1 == {} {
+          assert todo <= todo - {p} + Q1;
+          assert discovered == discovered + Q1;
+        } else {
+          assert |Q1| > 0;
+          assert |discovered| < |discovered + Q1|;
+        }
+        var discovered_old := discovered;
+        // For every r in Q1, prove it is in epsilon_closure(N, q)
+        forall r | r in Q1 {
+          EpsilonTransitionPreservesClosure(N, q, p, r);
+        }
+        assert forall r :: r in Q1 ==> r in epsilon_closure(N, q);
+        assert Q1 <= epsilon_closure(N, q);
+        // END-TODO(Invariant1)
 
         discovered := discovered + Q1;
         todo := todo + Q1;
 
-// BEGIN-TODO(Maintenance)
-// Eliminate these assume statements.
-    assume todo <= discovered <= epsilon_closure(N, q);
-    assume epsilon_closure(N, q) <= discovered + EC(N, todo);
-    assume E(N, discovered - todo) <= discovered;
-// END-TODO(Maintenance)
+        // BEGIN-TODO(Maintenance)
+        if Q1 != {} {
+          assert |discovered| > |discovered_old|;
+        }
+
+        DiscoveredUnionSubset(N, q, discovered_old, Q1);
+        assert todo <= discovered;
+        assert discovered <= epsilon_closure(N, q)
+        by {
+          DiscoveredUnionSubset(N, q, discovered_old, Q1);
+        }
+
+        assert epsilon_closure(N, q) <= discovered + EC(N, todo)
+        by {
+          forall r | r in epsilon_closure(N, q)
+            ensures r in discovered + EC(N, todo)
+          {
+            if r in discovered {
+              // r is already discovered
+            } else {
+              // There's an epsilon path from q to r
+              var path :| is_epsilon_path(N, path) && path[0] == q && path[|path|-1] == r;
+              assert q in discovered;
+              assert path[0] in discovered;
+              // Find the first undiscovered state in path
+              var i := 0;
+              while i < |path| && path[i] in discovered
+                invariant 0 <= i <= |path|
+                invariant forall j :: 0 <= j < i ==> path[j] in discovered
+              {
+                i := i + 1;
+              }
+
+              assert i > 0; // path[0] = q is discovered
+              if path[i-1] in todo {
+                // Then r is in EC(N, todo)
+                SuffixOfEpsilonPathIsEpsilonPath(N, path, i-1);
+                assert r in EC(N, todo);
+              } else {
+                // Contradiction: if path[i-1] is outside todo,
+                // it must be in discovered - todo whose epsilon successors are discovered
+                assert false;
+              }
+            }
+          }
+        }
+
+        assert E(N, discovered - todo) <= discovered;
+        // END-TODO(Maintenance)
       }
     }
 
-// BEGIN-TODO(Result)
-// Eliminate this assume statement.
-    assume discovered == epsilon_closure(N, q);
-// END-TODO(Result)
+    // BEGIN-TODO(Result)
+    assert todo == {};
+    assert epsilon_closure(N, q) <= discovered;
+    assert discovered == epsilon_closure(N, q);
+    // END-TODO(Result)
   }
 }

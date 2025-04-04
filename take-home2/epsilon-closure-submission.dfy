@@ -262,7 +262,7 @@ abstract module NFAAlgorithmsModule refines NFAModule
     while |todo| > 0
       // BEGIN-TODO(Termination)
       // Replace `*` with an appropriate decreases clause to ensure termination.
-      decreases (|epsilon_closure(N, q)| - |discovered|, |todo|)
+      decreases |N.Q - discovered|, |todo|
       invariant q in discovered
       // END-TODO(Termination)
       invariant todo <= discovered <= epsilon_closure(N, q)
